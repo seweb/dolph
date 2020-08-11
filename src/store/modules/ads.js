@@ -71,35 +71,35 @@ export default {
     },
 
     FILTER_ADS (state) {
-      let accounts = state.ads.all;
+      let ads = state.ads.all;
       const filters = state.filters;
 
       if (filters.name) {
         if (filters.name.length > 0) {
-          accounts = accounts.filter(account => {
+          ads = ads.filter(ad => {
             return (
-              account.name.toString().toLowerCase().search(filters.name.toLowerCase()) !== -1
+              ad.name.toString().toLowerCase().search(filters.name.toLowerCase()) !== -1
             );
           });
         }
       }
 
       if (filters.statuses && filters.statuses.length > 0) {
-        accounts = accounts.filter(function(account) {
-          return filters.statuses.indexOf(account.status) > -1;
+        ads = ads.filter(function(ad) {
+          return filters.statuses.indexOf(ad.status) > -1;
         });
       }
 
       if (this.state.adsmanager.filters.tags && this.state.adsmanager.filters.tags.length > 0) {
-        accounts = accounts.filter(account => {
+        ads = ads.filter(ad => {
           return this.state.adsmanager.filters.tags.some(tag => {
-            if (!Array.isArray(account.tags)) return false;
-            return account.tags.indexOf(tag.toString()) > -1;
+            if (!Array.isArray(ad.tags)) return false;
+            return ads.tags.indexOf(tag.toString()) > -1;
           });
         });
       }
       
-      state.ads.filtered = accounts;
+      state.ads.filtered = ads;
     },
   },
   actions: {
