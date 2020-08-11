@@ -26,7 +26,11 @@ export default {
     loading: {
       mainTable: false,
     },
-    stat: []
+    stat: [],
+    filters: {
+      name: '',
+      statuses: typeof localStorage.getItem('accounts-filters-statuses') === 'undefined' ? [] : JSON.parse(localStorage.getItem('accounts-filters-statuses')),
+    },
   },
   getters: {
     ...mixinDialogGetters,
@@ -35,6 +39,7 @@ export default {
     selected: state => state.ads.selected,
     loading: state => state.loading,
     stat: state => state.stat,
+    FILTERS: state => state.filters,
   },
   mutations: {
     ...mixinDialogMutations,
@@ -59,6 +64,42 @@ export default {
 
     SET_FILTERED: (state, payload) => {
       state.ads.filtered = payload;
+    },
+
+    SET_FILTERS_NAME: (state, payload) => {
+      state.filters.name = payload;
+    },
+
+    FILTER_ADS (state) {
+      let accounts = state.ads.all;
+      const filters = state.filters;
+
+      if (filters.name) {
+        if (filters.name.length > 0) {
+          accounts = accounts.filter(account => {
+            return (
+              account.name.toString().toLowerCase().search(filters.name.toLowerCase()) !== -1
+            );
+          });
+        }
+      }
+
+      if (filters.statuses && filters.statuses.length > 0) {
+        accounts = accounts.filter(function(account) {
+          return filters.statuses.indexOf(account.status) > -1;
+        });
+      }
+
+      if (this.state.adsmanager.filters.tags && this.state.adsmanager.filters.tags.length > 0) {
+        accounts = accounts.filter(account => {
+          return this.state.adsmanager.filters.tags.some(tag => {
+            if (!Array.isArray(account.tags)) return false;
+            return account.tags.indexOf(tag.toString()) > -1;
+          });
+        });
+      }
+      
+      state.ads.filtered = accounts;
     },
   },
   actions: {
@@ -102,6 +143,7 @@ export default {
       console.log('load ads response');
       console.log(response.data);
       console.log('===========================');
+      commit('FILTER_ADS', rootState.adsmanager.filters);
     },
 
     async loadStat({
@@ -134,7 +176,9 @@ export default {
         value: false,
       });
 
-      commit('SET_STAT', response.data.data);
+      //commit('SET_STAT', response.data.data);
+      console.log(response.data.data);
+      
     },
 
     async saveSelected(context, data) {
@@ -149,6 +193,10 @@ export default {
       context.commit('SET_ALL', []);
       context.commit('SET_FILTERED', []);
       context.commit('SET_SELECTED', []);
-    }
+    },
+
+    async setFiltersName(context, payload) {
+      context.commit('SET_FILTERS_NAME', payload);
+    },
   }
 };

@@ -103,7 +103,6 @@
         >
           <filters-date />
         </v-col>
-
         <!-- ПОИСК ПО НАЗВАНИЮ -->
         <v-col
           cols="12"
@@ -197,4 +196,3 @@ export default {
 };
 </script>
 
-<style scoped></style>
